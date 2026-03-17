@@ -51,7 +51,16 @@ pip install -r requirements.txt
 <details>
 <summary>Obtaining the Dataset</summary>
 
-You need the EMSCAD dataset to successfully run the notebooks. To obtain it, run the `download_data` script:
+You need the EMSCAD dataset to successfully run the notebooks. To obtain it, run
+the `download_data` script:
+
+<details>
+<summary>For Windows</summary>
+  
+```
+.\download_data.bat
+```
+</details>
 
 <details>
 <summary>For Linux/macOS</summary>
