@@ -11,7 +11,7 @@ hopes up.
 
 We created PhantomPositions to address this problem using different data science
 techniques, and to compare performance across each method in hopes of identifying
-the most effective way to identify phantom job postings.
+the most effective technique for detecting phantom job postings.
 
 ## Project Setup
 
@@ -21,10 +21,11 @@ cd PhantomPositions
 python -m venv venv
 ```
 
-Then activate the virtual environment.
+Then activate the virtual environment:
 
 <details>
 <summary>For Windows</summary>
+  
 ```
 .\venv\Scripts\activate
 ```
@@ -32,6 +33,7 @@ Then activate the virtual environment.
 
 <details>
 <summary>For Linux/macOS</summary>
+  
 ```
 source venv/bin/activate
 ```
