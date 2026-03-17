@@ -66,3 +66,9 @@ so, run the `download_data` script:
 sh download_data.sh
 ```
 </details>
+
+### Verify Setup
+
+After installing the dependencies and downloading the dataset, open
+`environment_test.ipynb` in a notebook and run all the cells. This script
+verifies that the environment is set up correctly.
