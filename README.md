@@ -15,10 +15,9 @@ the most effective technique for detecting phantom job postings.
 
 ## Project Setup
 
-<details>
-<summary>Environment and Dependencies</summary>
+### Environment and Dependencies
 
-After cloning this repository, run the following:
+After cloning the repository, run the following:
 ```
 cd PhantomPositions
 python -m venv venv
@@ -46,13 +45,11 @@ From there, just install the dependencies from `requirements.txt`:
 ```
 pip install -r requirements.txt
 ```
-</details>
 
-<details>
-<summary>Obtaining the Dataset</summary>
+### Obtaining the Dataset
 
-You need the EMSCAD dataset to successfully run the notebooks. To obtain it, run
-the `download_data` script:
+You need to download the EMSCAD dataset successfully run the notebooks. To do
+so, run the `download_data` script:
 
 <details>
 <summary>For Windows</summary>
