@@ -208,4 +208,4 @@ def load_and_split(feature_set='combined'):
     print(f"Training samples after SMOTE: {X_train_res.shape[0]}")
     print(f"Test samples: {X_test.shape[0]}")
 
-    return X_train_res, Y_train_res, X_test, Y_test
+    return X_train_res, X_test, Y_train_res, Y_test
