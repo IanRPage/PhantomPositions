@@ -159,8 +159,8 @@ def load_and_split(feature_set='combined'):
     Returns
     -------
     X_train_res : Training features after SMOTE.
-    Y_train_res : Resampled training labels.
     X_test : Test features (unmodified by SMOTE).
+    Y_train_res : Resampled training labels.
     Y_test : Test labels.
     """
     df = load_data()
