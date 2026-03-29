@@ -20,9 +20,13 @@ the most effective technique for detecting phantom job postings.
 <details>
 <summary>If using Windows 10 or Later</summary>
   
-  <br> You may need to <strong>enable Long Paths</strong> to avoid issues with file paths during setup. You can do this by modifying your Registry.</br>
-  <a href ="https://www.youtube.com/watch?v=JIBsJx7U0Xw"> Watch this video for a step-by-step walkthrough on how to enable Long Paths in Windows 11 </a>
-      
+  <br>
+  You may need to **enable Long Paths** to avoid issues with file paths during
+  setup. You can do this by modifying your Registry.
+
+  <a href ="https://www.youtube.com/watch?v=JIBsJx7U0Xw"> Watch this video for a
+  step-by-step walkthrough on how to enable Long Paths in Windows 11</a>
+
 </details>
 
 After cloning the repository, run the following:
