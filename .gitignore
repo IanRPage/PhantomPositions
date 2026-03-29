@@ -2,5 +2,7 @@ venv/
 
 data/*
 !data/README.md
+!data/preprocessing.py
+!data/__init__.py
 
 **/.ipynb_checkpoints/
