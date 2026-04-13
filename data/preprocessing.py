@@ -58,6 +58,10 @@ TEXT_COLS = ['title', 'location', 'company_profile',
 CAT_COLS  = ['department', 'salary_range', 'employment_type', 'required_experience',
              'required_education', 'industry', 'function']
 
+# 'telecommuting', 'has_company_logo', and 'has_questions' are binary, so they get passed through automatically to the dataframe, hence not being added to the lists above.
+
+DROP_COLS = []
+
 def load_data():
     """
     Load the dataset from the local CSV file.
@@ -102,13 +106,21 @@ def build_features(df, feature_set='combined'):
     """
     Y = df['fraudulent']
 
+    """ # Add binary indicators for missing text fields before filling with ''
+    for col in TEXT_COLS:
+        df[f'{col}_missing'] = df[col].isnull().astype(int)
+
+    # Fill missing text fields
+    df[TEXT_COLS] = df[TEXT_COLS].fillna('') """
+
     # ----------------------------
     # Metadata only
     # ----------------------------
     if feature_set == 'metadata_only':
-        X = df.drop(columns=['fraudulent', 'job_id'] + TEXT_COLS)
-        X = pd.get_dummies(X, columns=CAT_COLS)
-        return X, Y
+        X = df.drop(columns=['fraudulent', 'job_id'] + TEXT_COLS + DROP_COLS, errors='ignore')
+        available_cat_cols = [col for col in CAT_COLS if col in X.columns]
+        X = pd.get_dummies(X, columns=available_cat_cols)
+        return X, Y, None
 
     # ----------------------------
     # Text only (TF-IDF)
@@ -116,27 +128,20 @@ def build_features(df, feature_set='combined'):
     elif feature_set == 'text_only':
         # Combine all text columns into a single string per posting
         text_data = df[TEXT_COLS].fillna('').agg(' '.join, axis=1)
-        vectorizer = TfidfVectorizer(max_features=5000)
-        X = vectorizer.fit_transform(text_data)
-        return X, Y
+        return None, Y, text_data
 
     # ----------------------------
     # Combined (metadata + text)
     # ----------------------------
     elif feature_set == 'combined':
         # Metadata side
-        meta = df.drop(columns=['fraudulent', 'job_id'] + TEXT_COLS)
-        meta = pd.get_dummies(meta, columns=CAT_COLS)
+        meta = df.drop(columns=['fraudulent', 'job_id'] + TEXT_COLS + DROP_COLS, errors='ignore')
+        available_cat_cols = [col for col in CAT_COLS if col in meta.columns]
+        meta = pd.get_dummies(meta, columns=available_cat_cols)
 
         # Text side
         text_data = df[TEXT_COLS].fillna('').agg(' '.join, axis=1)
-        vectorizer = TfidfVectorizer(max_features=5000)
-        text_matrix = vectorizer.fit_transform(text_data)
-
-        # Convert metadata to sparse and combine
-        meta_sparse = sp.csr_matrix(meta.values.astype(float))
-        X = sp.hstack([meta_sparse, text_matrix])
-        return X, Y
+        return meta, Y, text_data
 
     else:
         raise ValueError(f"Invalid feature_set '{feature_set}'. Choose 'metadata_only', 'text_only', or 'combined'.")
@@ -164,22 +169,47 @@ def load_and_split(feature_set='combined'):
     Y_test : Test labels.
     """
     df = load_data()
-    X, Y = build_features(df, feature_set)
+    meta, Y, text_data = build_features(df, feature_set)
 
     # ----------------------------
     # Train/test split
     # ----------------------------
-    X_train, X_test, Y_train, Y_test = train_test_split(
-        X, Y, test_size=0.3, random_state=5, stratify=Y
-    )
+    if feature_set == 'metadata_only':
+        X_train, X_test, Y_train, Y_test = train_test_split(
+            meta, Y, test_size=0.3, random_state=5, stratify=Y
+        )
 
-    # Uncomment next line to Check fraud counts before SMOTE
-    # print(f"Before SMOTE: {Y_train.value_counts().to_dict()}") 
+    elif feature_set == 'text_only':
+        text_train, text_test, Y_train, Y_test = train_test_split(
+            text_data, Y, test_size=0.3, random_state=5, stratify=Y
+        )
+        # Fit vectorizer on training text only
+        vectorizer = TfidfVectorizer(max_features=5000, stop_words='english',
+                                     ngram_range=(1,2), min_df=5, max_df=0.9)
+        X_train = vectorizer.fit_transform(text_train)
+        X_test  = vectorizer.transform(text_test)
+
+    elif feature_set == 'combined':
+        # Split metadata and text in parallel using the same indices
+        meta_train, meta_test, text_train, text_test, Y_train, Y_test = train_test_split(
+            meta, text_data, Y, test_size=0.3, random_state=5, stratify=Y
+        )
+        # Fit vectorizer on training text only
+        vectorizer = TfidfVectorizer(max_features=5000, stop_words='english',
+                                     ngram_range=(1,2), min_df=5, max_df=0.9)
+        text_train_vec = vectorizer.fit_transform(text_train)
+        text_test_vec  = vectorizer.transform(text_test)
+
+        # Combine metadata and text
+        meta_train_sparse = sp.csr_matrix(meta_train.values.astype(float))
+        meta_test_sparse  = sp.csr_matrix(meta_test.values.astype(float))
+        X_train = sp.hstack([meta_train_sparse, text_train_vec])
+        X_test  = sp.hstack([meta_test_sparse,  text_test_vec])
 
     # ----------------------------
     # Feature scaling
     # ----------------------------
-    scaler = StandardScaler(with_mean=False)  # with_mean=False required for sparse matrices
+    scaler = StandardScaler(with_mean=False)
     X_train = scaler.fit_transform(X_train)
     X_test  = scaler.transform(X_test)
 
@@ -188,21 +218,6 @@ def load_and_split(feature_set='combined'):
     # ----------------------------
     sm = SMOTE(random_state=5, k_neighbors=3)
     X_train_res, Y_train_res = sm.fit_resample(X_train, Y_train)
-
-    """ Remove Block Comment to: 
-    # Check fraud counts after SMOTE
-    print(f"After SMOTE: {pd.Series(Y_train_res).value_counts().to_dict()}")
-
-    # Indices of minority class in resampled set
-    real_fraud = X_train_res[:606]
-    synthetic_fraud = X_train_res[606:]
-
-    # Compare variance across features
-    real_var = np.var(real_fraud, axis=0).mean()
-    synthetic_var = np.var(synthetic_fraud, axis=0).mean()
-
-    print(f"Mean feature variance - Real fraud: {real_var:.4f}")
-    print(f"Mean feature variance - Synthetic fraud: {synthetic_var:.4f}") """
 
     print(f"Feature set: {feature_set}")
     print(f"Training samples after SMOTE: {X_train_res.shape[0]}")
