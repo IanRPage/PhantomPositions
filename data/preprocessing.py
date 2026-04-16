@@ -106,13 +106,6 @@ def build_features(df, feature_set='combined'):
     """
     Y = df['fraudulent']
 
-    """ # Add binary indicators for missing text fields before filling with ''
-    for col in TEXT_COLS:
-        df[f'{col}_missing'] = df[col].isnull().astype(int)
-
-    # Fill missing text fields
-    df[TEXT_COLS] = df[TEXT_COLS].fillna('') """
-
     # ----------------------------
     # Metadata only
     # ----------------------------
@@ -173,6 +166,7 @@ def load_and_split(feature_set='combined'):
 
     # ----------------------------
     # Train/test split
+    # For the Logistic Regression model, the max_features parameter in TfidfVectorizer() should be set to 3000 for optimal performance. 
     # ----------------------------
     if feature_set == 'metadata_only':
         X_train, X_test, Y_train, Y_test = train_test_split(
@@ -184,8 +178,7 @@ def load_and_split(feature_set='combined'):
             text_data, Y, test_size=0.3, random_state=5, stratify=Y
         )
         # Fit vectorizer on training text only
-        vectorizer = TfidfVectorizer(max_features=5000, stop_words='english',
-                                     ngram_range=(1,2), min_df=5, max_df=0.9)
+        vectorizer = TfidfVectorizer(max_features=5000, stop_words='english', ngram_range=(1,2), min_df=5, max_df=0.9)
         X_train = vectorizer.fit_transform(text_train)
         X_test  = vectorizer.transform(text_test)
 
@@ -195,8 +188,7 @@ def load_and_split(feature_set='combined'):
             meta, text_data, Y, test_size=0.3, random_state=5, stratify=Y
         )
         # Fit vectorizer on training text only
-        vectorizer = TfidfVectorizer(max_features=5000, stop_words='english',
-                                     ngram_range=(1,2), min_df=5, max_df=0.9)
+        vectorizer = TfidfVectorizer(max_features=5000, stop_words='english', ngram_range=(1,2), min_df=5, max_df=0.9)
         text_train_vec = vectorizer.fit_transform(text_train)
         text_test_vec  = vectorizer.transform(text_test)
 
