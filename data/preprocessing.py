@@ -14,13 +14,13 @@ At the top of your model notebook, add:
 
     import sys
     sys.path.append('..')
-    from data.preprocess import load_and_split
+    from data.preprocessing import load_and_split
 
 Then call load_and_split() with one of three feature conditions:
 
-    X_train, Y_train, X_test, Y_test = load_and_split(feature_set='text_only')
-    X_train, Y_train, X_test, Y_test = load_and_split(feature_set='metadata_only')
-    X_train, Y_train, X_test, Y_test = load_and_split(feature_set='combined')
+    X_train_res, X_test, Y_train_res, Y_test = load_and_split(feature_set='text_only')
+    X_train_res, X_test, Y_train_res, Y_test = load_and_split(feature_set='metadata_only')
+    X_train_res, X_test, Y_train_res, Y_test = load_and_split(feature_set='combined')
 
 WHAT THIS MODULE HANDLES
 ---------------------------------
@@ -31,8 +31,8 @@ WHAT THIS MODULE HANDLES
 
 WHAT GETS RETURNED
 ------------------
-    X_train: resampled, scaled training features (post-SMOTE)
-    Y_train: resampled training labels (post-SMOTE)
+    X_train_res: resampled, scaled training features (post-SMOTE)
+    Y_train_res: resampled training labels (post-SMOTE)
     X_test: scaled test features (original distribution, untouched)
     Y_test: test labels (original distribution, untouched) """
 
@@ -94,10 +94,12 @@ def build_features(df, feature_set='combined'):
 
     Returns
     -------
-    X : array-like or sparse matrix
-        Feature matrix.
+    meta : pandas.DataFrame or None
+        One-hot encoded metadata features. None for text_only condition.
     Y : pandas.Series
         Target labels (fraudulent indicator).
+    text_data : pandas.Series or None
+        Concatenated raw text fields per posting. None for metadata_only condition.
 
     Raises
     ------
@@ -156,17 +158,22 @@ def load_and_split(feature_set='combined'):
 
     Returns
     -------
-    X_train_res : Training features after SMOTE.
-    X_test : Test features (unmodified by SMOTE).
-    Y_train_res : Resampled training labels.
-    Y_test : Test labels.
+    X_train_res : scipy.sparse matrix or numpy.ndarray
+        Scaled, SMOTE-resampled training features.
+    X_test : scipy.sparse matrix or numpy.ndarray
+        Scaled test features, preserving original class distribution.
+    Y_train_res : pandas.Series
+        Resampled training labels (post-SMOTE, balanced classes).
+    Y_test : pandas.Series
+        Test labels, preserving original class distribution.
     """
     df = load_data()
     meta, Y, text_data = build_features(df, feature_set)
 
     # ----------------------------
     # Train/test split
-    # For the Logistic Regression model, the max_features parameter in TfidfVectorizer() should be set to 3000 for optimal performance. 
+    # Note: Logistic Regression model shows improved recall on the combined condition at max_features=3000 in TfidfVectorizer(), 
+    # but 5000 is used here for consistency across all model comparisons. 
     # ----------------------------
     if feature_set == 'metadata_only':
         X_train, X_test, Y_train, Y_test = train_test_split(
