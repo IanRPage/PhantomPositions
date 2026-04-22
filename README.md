@@ -105,4 +105,5 @@ accomplishing different tasks.
 - To compare each model side-by-side, run `src/modelComparison.ipynb`.
 
     - It will show the same visualizations and metrics from the model notebooks,
-      but combine them for easy comparison, in addition to more visualizations.
+      but combine them for easy comparison, in addition to more visualizations,
+      and also save all the figures to the `outputs` directory.
