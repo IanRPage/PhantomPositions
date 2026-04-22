@@ -141,7 +141,7 @@ def build_features(df, feature_set='combined'):
         raise ValueError(f"Invalid feature_set '{feature_set}'. Choose 'metadata_only', 'text_only', or 'combined'.")
 
 
-def load_and_split(feature_set='combined'):
+def load_and_split(feature_set='combined', lr=False):
     """
     Full preprocessing pipeline:
         - Load data
@@ -194,7 +194,8 @@ def load_and_split(feature_set='combined'):
             meta, text_data, Y, test_size=0.3, random_state=5, stratify=Y
         )
         # Fit vectorizer on training text only
-        vectorizer = TfidfVectorizer(max_features=3000, stop_words='english', ngram_range=(1,2), min_df=5, max_df=0.9)
+        features = 3000 if lr else 5000
+        vectorizer = TfidfVectorizer(max_features=features, stop_words='english', ngram_range=(1,2), min_df=5, max_df=0.9)
         text_train_vec = vectorizer.fit_transform(text_train)
         text_test_vec  = vectorizer.transform(text_test)
 
