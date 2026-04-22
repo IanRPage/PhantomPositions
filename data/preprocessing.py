@@ -37,7 +37,6 @@ WHAT GETS RETURNED
     Y_test: test labels (original distribution, untouched) """
 
 import pandas as pd
-import numpy as np
 from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -73,7 +72,7 @@ def load_data():
     """
     data_path = Path(__file__).parent / "fake_job_postings.csv"
     df = pd.read_csv(data_path)
-    print(f"=== data loaded successfully ===")
+    print("=== data loaded successfully ===")
     print(f"Shape: {df.shape}")
     return df
 
