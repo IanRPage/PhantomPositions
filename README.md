@@ -82,7 +82,7 @@ sh download_data.sh
 ### Verify Setup
 
 After installing the dependencies and downloading the dataset, open
-`environment_test.ipynb` in a notebook and run all the cells. This script
+`environment_test.ipynb` in a notebook and run all the cells. This notebook
 verifies that the environment is set up correctly.
 
 ## Running the Project
