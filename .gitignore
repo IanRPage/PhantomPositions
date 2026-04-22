@@ -6,4 +6,4 @@ data/*
 !data/__init__.py
 
 **/.ipynb_checkpoints/
-**/__pycache__/*
+**/__pycache__/
