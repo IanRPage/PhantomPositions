@@ -4,8 +4,8 @@ This directory contains the written deliverables for the Phantom Positions proje
 
 ## Documents
 
-- **PhantomPositions_Proposal.pdf** — Initial project proposal
-- **PhantomPositions_FinalReportl.pdf** — Final project report
+- [**PhantomPositions_Proposal.pdf**](PhantomPositions_Proposal.pdf) – Initial project proposal  
+- [**PhantomPositions_FinalReport.pdf**](PhantomPositions_FinalReport.pdf) – Final project report  
 
 ## Presentations
 
