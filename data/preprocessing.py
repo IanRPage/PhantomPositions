@@ -89,7 +89,7 @@ def build_features(df, feature_set='combined'):
         Feature configuration to use:
             - 'metadata_only'
             - 'text_only'
-            - 'combined' (default)
+            - 'combined'
 
     Returns
     -------
